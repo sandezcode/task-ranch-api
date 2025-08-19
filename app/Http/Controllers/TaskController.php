@@ -254,4 +254,73 @@ class TaskController extends Controller
             ], 404);
         }
     }
+
+    /**
+     * Custom method.
+     */
+    public function completeTask(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // Obtiene al usuario actualmente autenticado y decodifica los datos JSON de la solicitud.
+        $user = $request->user();
+        $requestData = json_decode($request->getContent(), true);
+
+        if($requestData){
+            /**
+             * Valida los datos entrantes de la solicitud.
+             */
+            $dataValidation = Validator::make($requestData, [
+                'task_id' => ['required', 'integer']
+            ]);
+
+            if($dataValidation->fails()){
+                return response()->json([
+                    'success' => false,
+                    'step' => 1,
+                    'errors' => $dataValidation->errors()->all()
+                ], 400);
+            }
+
+            /**
+             * Consulta y verifica la existencia de la tarea que se actualizará como completada perteneciente al usuario.
+             */
+            $task = Task::where('task_id', $requestData['task_id'])->where('user_id', $user->user_id)->first();
+
+            if($task === null){
+                return response()->json([
+                    'success' => false,
+                    'step' => 0,
+                    'errors' => ['Tarea no encontrada.']
+                ], 404);
+            }
+
+            $task->status = 1;
+            $task->save();
+
+            /**
+             * Prepara la respuesta:
+             * Añade información adicional al objeto $task.
+             */
+            $task['start_date_human'] = Carbon::parse($task->start_date)->translatedFormat('d F Y');
+            //------------------------------ Propiedades ocultas ------------------------------
+            $task->user->makeHidden('email_verified_at');
+            $task->makeHidden('user_id');
+
+            /**
+             * Envía una respuesta JSON con todos los detalles al usuario.
+             */
+            return response()->json([
+                'success' => true,
+                'message' => 'La tarea se ha completado.',
+                'data' => [
+                    'task' => $task
+                ]
+            ]);
+        }else{
+            return response()->json([
+                'success' => false,
+                'step' => 0,
+                'errors' => ['La solicitud llegó sin datos.']
+            ], 400);
+        }
+    }
 }

@@ -26,10 +26,13 @@ Route::prefix('auth')->group(function(){
 //------------------------------ Private Routes ------------------------------
 
 Route::middleware('auth:sanctum')->group(function(){
+
     //------------------------------ Task routes ------------------------------
     Route::prefix('tasks')->group(function(){
         Route::get('/', [TaskController::class, 'index']);
         Route::post('/', [TaskController::class, 'store']);
         Route::patch('/{id}', [TaskController::class, 'update']);
+        Route::delete('/{id}', [TaskController::class, 'destroy']);
     });
+
 });

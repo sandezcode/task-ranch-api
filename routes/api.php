@@ -27,6 +27,11 @@ Route::prefix('auth')->group(function(){
 
 Route::middleware('auth:sanctum')->group(function(){
 
+    //------------------------------ Auth routes ------------------------------
+    Route::prefix('auth')->group(function(){
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
+
     //------------------------------ Task routes ------------------------------
     Route::prefix('tasks')->group(function(){
         Route::get('/', [TaskController::class, 'index']);

@@ -14,7 +14,32 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        /**
+         * Consulta el listado de tareas.
+         */
+        $tasks = Task::orderBy('created_at', 'desc')->get();
+
+        foreach($tasks as $task){
+            /**
+             * Prepara la respuesta:
+             * Añade información adicional al objeto $task.
+             */
+            $task['start_date_human'] = Carbon::parse($task->start_date)->translatedFormat('d F Y');
+            //------------------------------ Propiedades ocultas ------------------------------
+            $task->user->makeHidden('email_verified_at');
+            $task->makeHidden('user_id');
+        }
+
+        /**
+         * Envía una respuesta JSON con todos los detalles al usuario.
+         */
+        return response()->json([
+            'success' => true,
+            'message' => 'Listado de tareas generado.',
+            'data' => [
+                'tasks' => $tasks
+            ]
+        ]);
     }
 
     /**
@@ -73,6 +98,7 @@ class TaskController extends Controller
              * Prepara la respuesta:
              * Añade información adicional al objeto $task.
              */
+            $task['start_date_human'] = Carbon::parse($task->start_date)->translatedFormat('d F Y');
             //------------------------------ Propiedades ocultas ------------------------------
             $task->user->makeHidden('email_verified_at');
             $task->makeHidden('user_id');

@@ -152,4 +152,17 @@ class AuthController extends Controller
             ], 400);
         }
     }
+
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
+    {
+        /**
+         * Elimina el token de autenticación del usuario.
+         */
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Has cerrado sesión.'
+        ]);
+    }
 }

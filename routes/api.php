@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/', [TaskController::class, 'store']);
         Route::patch('/{id}', [TaskController::class, 'update']);
         Route::delete('/{id}', [TaskController::class, 'destroy']);
+        //------------------------------ Custom methods ------------------------------
+        Route::post('/complete-task', [TaskController::class, 'completeTask']);
     });
 
 });

@@ -220,8 +220,38 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id): \Illuminate\Http\JsonResponse
     {
-        //
+        // Obtiene al usuario actualmente autenticado.
+        $user = $request->user();
+
+        /**
+         * Consulta y verifica la existencia de la tarea que se eliminará perteneciente al usuario.
+         */
+        $task = Task::where('task_id', $id)->where('user_id', $user->user_id)->first();
+
+        if($task){
+            /**
+             * Elimina la tarea.
+             */
+            $task->delete();
+
+            /**
+             * Envía una respuesta JSON con todos los detalles al usuario.
+             */
+            return response()->json([
+                'success' => true,
+                'message' => 'La tarea se ha eliminado.',
+                'data' => [
+                    'deleted_task_id' => intval($id)
+                ]
+            ]);
+        }else{
+            return response()->json([
+                'success' => false,
+                'step' => 0,
+                'errors' => ['Tarea no encontrada.']
+            ], 404);
+        }
     }
 }

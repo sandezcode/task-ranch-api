@@ -28,6 +28,7 @@ Route::prefix('auth')->group(function(){
 Route::middleware('auth:sanctum')->group(function(){
     //------------------------------ Task routes ------------------------------
     Route::prefix('tasks')->group(function(){
+        Route::get('/', [TaskController::class, 'index']);
         Route::post('/', [TaskController::class, 'store']);
     });
 });
